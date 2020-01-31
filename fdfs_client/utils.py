@@ -5,9 +5,8 @@ from configparser import DEFAULTSECT, MissingSectionHeaderError, ParsingError, R
     NoSectionError
 import os
 import stat
-from mutagen._compat import StringIO
+from io import StringIO
 
-from requests.compat import basestring
 
 SUFFIX = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
@@ -77,16 +76,16 @@ class Fdfs_ConfigParser(RawConfigParser):
 
         self._default_section = section
 
-    def read(self, filenames):
-        if isinstance(filenames, basestring):
+    def read(self, filenames, encoding=None):
+        if isinstance(filenames, (str, bytes)):
             filenames = [filenames]
 
         read_ok = []
         for filename in filenames:
             try:
-                with open(filename) as fp:
+                with open(filename, encoding=encoding) as fp:
                     self.readfp(fp)
-            except IOError as e:
+            except (IOError, OSError):
                 continue
             else:
                 read_ok.append(filename)
